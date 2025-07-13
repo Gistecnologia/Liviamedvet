@@ -48,18 +48,68 @@
             font-family: 'Poppins', sans-serif;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            overflow-x: hidden;
         }
-        
+
+        /* Efeitos de hover aprimorados */
+        .menu-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--tw-color-primary);
+            transition: width 0.3s ease;
+        }
+
+        .menu-item:hover::after {
+            width: 100%;
+        }
+
+        /* Melhorias para dispositivos móveis */
         @media (max-width: 640px) {
             input, select, textarea {
-                font-size: 16px !important; /* Previne zoom automático em iOS */
+                font-size: 16px !important;
+            }
+            
+            h1 {
+                font-size: 2rem !important;
+                line-height: 1.2 !important;
+            }
+            
+            .container {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            .grid {
+                gap: 1.5rem !important;
             }
         }
         
-        /* Melhora a área de toque em dispositivos móveis */
+        /* Melhorias para tablets */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .container {
+                padding-left: 2rem !important;
+                padding-right: 2rem !important;
+            }
+            
+            .grid {
+                gap: 2rem !important;
+            }
+        }
+        
+        /* Ajustes gerais de responsividade */
         .touch-target {
             min-height: 44px;
             min-width: 44px;
+            padding: 0.5rem;
         }
 
         .parallax {
@@ -68,70 +118,96 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
+        
+        /* Melhorias nas animações */
         .hover-scale {
             transition: transform 0.3s ease;
+            will-change: transform;
         }
         .hover-scale:hover {
             transform: scale(1.03);
         }
+        
+        /* Melhorias nas sombras e cards */
         .card-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: box-shadow 0.3s ease, transform 0.3s ease;
+            will-change: transform, box-shadow;
         }
         .card-shadow:hover {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transform: translateY(-2px);
         }
-        .gradient-text {
-            background: linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        
+        /* Melhorias em formulários */
+        input, textarea, select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 0.5rem;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        
+        /* Melhorias em imagens */
+        img {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
         }
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
+        
+        /* Otimizações de desempenho */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Fix para iOS */
+        @supports (-webkit-touch-callout: none) {
+            .min-h-screen {
+                min-height: -webkit-fill-available;
+            }
+        }
+        
+        /* Melhorias na navegação */
+        nav {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
     </style>
 </head>
 <body class="bg-white">
     <!-- Header -->
     <header class="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
-        <nav class="container mx-auto px-4 py-2 sm:py-4 flex items-center">
-            <!-- Mobile menu button -->
-            <button class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors mr-4" id="mobile-menu-button" aria-label="Menu">
-                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                </svg>
-            </button>
-            <img src="Imagens/imagem5.png" alt="Lívia.medvet" class="h-16 sm:h-20 w-auto">
+        <nav class="container mx-auto px-4 py-2 sm:py-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="w-full md:w-auto flex justify-center md:justify-start mb-4 md:mb-0">
+                    <img src="Imagens/imagem5.png" alt="Lívia.medvet" class="h-12 sm:h-16 md:h-20 w-auto">
+                </div>
             <!-- Desktop menu -->
-            <div class="hidden md:flex flex-1 justify-center space-x-6 ml-4">
-                <a href="#beneficios" class="text-gray-600 hover:text-primary transition">Benefícios</a>
-                <a href="#como-funciona" class="text-gray-600 hover:text-primary transition">Como Funciona</a>
-                <a href="#servicos" class="text-gray-600 hover:text-primary transition">Serviços</a>
-                <a href="#depoimentos" class="text-gray-600 hover:text-primary transition">Depoimentos</a>
-                <a href="#contato" class="text-gray-600 hover:text-primary transition">Contato</a>
+            <div class="w-full md:w-auto">
+                <div class="hidden md:flex items-center justify-center space-x-6">
+                    <a href="#beneficios" class="text-gray-600 hover:text-primary transition">Benefícios</a>
+                    <a href="#como-funciona" class="text-gray-600 hover:text-primary transition">Como Funciona</a>
+                    <a href="#servicos" class="text-gray-600 hover:text-primary transition">Serviços</a>
+                    <a href="#depoimentos" class="text-gray-600 hover:text-primary transition">Depoimentos</a>
+                    <a href="#contato" class="text-gray-600 hover:text-primary transition">Contato</a>
+                    <a href="https://cal.com/liviamedvet/veterinaria" target="_blank" rel="noopener" class="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition">Agende Agora</a>
+                </div>
             </div>
-            <a href="https://cal.com/liviamedvet/veterinaria" target="_blank" rel="noopener" class="hidden md:block bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition ml-4">Agende Agora</a>
             <!-- Mobile menu -->
-            <div class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 z-50" id="mobile-menu">
-                <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-xl p-6 overflow-y-auto transition-transform duration-300">
-                    <button class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors" id="mobile-menu-close" aria-label="Fechar menu">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="hidden fixed inset-0 bg-gray-800/60 backdrop-blur-sm z-50" id="mobile-menu">
+                <div class="fixed inset-y-0 right-0 max-w-[280px] w-full bg-white/95 backdrop-blur-sm shadow-[-5px_0_25px_rgba(0,0,0,0.1)] p-6 overflow-y-auto transition-all duration-300 ease-in-out transform translate-x-0">
+                    <button class="absolute top-4 left-4 p-2 hover:bg-primary/10 rounded-full transition-all duration-300 touch-target group" id="mobile-menu-close" aria-label="Fechar menu">
+                        <svg class="w-6 h-6 text-gray-600 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
-                    <div class="mt-16 flex flex-col space-y-5">
-                        <a href="#beneficios" class="text-gray-600 hover:text-primary transition">Benefícios</a>
-                        <a href="#como-funciona" class="text-gray-600 hover:text-primary transition">Como Funciona</a>
-                        <a href="#servicos" class="text-gray-600 hover:text-primary transition">Serviços</a>
-                        <a href="#depoimentos" class="text-gray-600 hover:text-primary transition">Depoimentos</a>
-                        <a href="#contato" class="text-gray-600 hover:text-primary transition">Contato</a>
-                        <a href="https://cal.com/liviamedvet/veterinaria" target="_blank" rel="noopener" class="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition text-center">Agende Agora</a>
+                    <div class="mt-16 flex flex-col space-y-6">
+                        <a href="#beneficios" class="text-gray-600 hover:text-primary transition py-2 text-lg">Benefícios</a>
+                        <a href="#como-funciona" class="text-gray-600 hover:text-primary transition py-2 text-lg">Como Funciona</a>
+                        <a href="#servicos" class="text-gray-600 hover:text-primary transition py-2 text-lg">Serviços</a>
+                        <a href="#depoimentos" class="text-gray-600 hover:text-primary transition py-2 text-lg">Depoimentos</a>
+                        <a href="#contato" class="text-gray-600 hover:text-primary transition py-2 text-lg">Contato</a>
+                        <a href="https://cal.com/liviamedvet/veterinaria" target="_blank" rel="noopener" class="bg-primary text-white px-6 py-3 rounded-full hover:bg-primary/90 transition text-center text-lg shadow-lg mt-4">Agende Agora</a>
                     </div>
                 </div>
             </div>
@@ -141,17 +217,17 @@
     <!-- Hero Section -->
     <section class="pt-20 sm:pt-24 pb-12 md:pt-32 md:pb-20 bg-gradient-to-br from-white via-primary/5 to-secondary/5">
         <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row items-center gap-8 sm:gap-12">
+            <div class="flex flex-col md:flex-row items-center gap-6 sm:gap-8 md:gap-12">
                 <div class="flex-1 space-y-4 sm:space-y-6 text-center md:text-left" data-aos="fade-right">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 leading-tight">Sua consulta veterinária agora é online</h1>
-                    <p class="text-lg sm:text-xl text-gray-600">Atendimento profissional e dedicado para seu pet, no conforto do seu lar.</p>
-                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                        <a href="https://cal.com/liviamedvet/veterinaria" target="_blank" rel="noopener" class="bg-primary text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-primary/90 transition text-center">Agende uma Consulta</a>
-                        <a href="#como-funciona" class="border-2 border-primary text-primary px-8 py-3 rounded-full text-lg font-medium hover:bg-primary/10 transition text-center">Como Funciona</a>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 leading-tight max-w-2xl mx-auto md:mx-0">Sua consulta veterinária agora é online</h1>
+                    <p class="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto md:mx-0">Atendimento profissional e dedicado para seu pet, no conforto do seu lar.</p>
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
+                        <a href="https://cal.com/liviamedvet/veterinaria" target="_blank" rel="noopener" class="touch-target bg-primary text-white px-6 sm:px-8 py-3 rounded-full text-base sm:text-lg font-medium hover:bg-primary/90 transition text-center shadow-lg hover:shadow-xl">Agende uma Consulta</a>
+                        <a href="#como-funciona" class="touch-target border-2 border-primary text-primary px-6 sm:px-8 py-3 rounded-full text-base sm:text-lg font-medium hover:bg-primary/10 transition text-center">Como Funciona</a>
                     </div>
                 </div>
-                <div class="flex-1" data-aos="fade-left">
-                    <img src="Imagens/imagem1.JPG" alt="Veterinária em consulta online" class="rounded-lg shadow-xl">
+                <div class="flex-1 mt-8 md:mt-0" data-aos="fade-left">
+                    <img src="Imagens/imagem1.JPG" alt="Veterinária em consulta online" class="rounded-lg shadow-xl w-full max-w-lg mx-auto md:max-w-none">
                 </div>
             </div>
         </div>
@@ -489,25 +565,6 @@
 
         // Chamar a função quando a página carregar
         window.addEventListener('load', checkFormStatus);
-
-        // Menu mobile
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenuClose = document.getElementById('mobile-menu-close');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileMenuLinks = mobileMenu.getElementsByTagName('a');
-
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle('hidden');
-            document.body.classList.toggle('overflow-hidden');
-        }
-
-        mobileMenuButton.addEventListener('click', toggleMobileMenu);
-        mobileMenuClose.addEventListener('click', toggleMobileMenu);
-
-        // Fechar menu ao clicar em um link
-        Array.from(mobileMenuLinks).forEach(link => {
-            link.addEventListener('click', toggleMobileMenu);
-        });
 
         // Smooth scroll para links de navegação
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
