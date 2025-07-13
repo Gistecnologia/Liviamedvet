@@ -1,103 +1,127 @@
 <?php
+
 // Configurações do SMTP
-$smtp_host = 'smtp.zoho.com';
-$smtp_username = 'contato@liviamedvet.com.br'; // Substitua pelo seu email do Zoho
-$smtp_password = 'Lfmslmlb_2026!'; // Substitua pela sua senha do Zoho
-$smtp_port = 587; // Porta padrão para TLS
-$smtp_secure = false;
-
-// Recupera os dados do formulário
-$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-$pet = filter_input(INPUT_POST, 'pet', FILTER_SANITIZE_STRING);
-$message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
-
-// Verifica se os campos obrigatórios foram preenchidos
-if (!$name || !$email || !$pet || !$message) {
-    header('Location: index.html?status=error');
-    exit;
-}
-
-// Monta o cabeçalho do email
-$to = 'contato@liviamedvet.com.br'; // Email que receberá as mensagens
-$subject = "Novo contato do site - " . $name;
-
-// Monta o corpo do email
-$email_body = "Nome: " . $name . "\n";
-$email_body .= "Email: " . $email . "\n";
-$email_body .= "Nome do Pet: " . $pet . "\n";
-$email_body .= "Mensagem: " . $message . "\n";
-
-// Cabeçalhos adicionais
-$headers = array(
-    'From' => $smtp_username,
-    'Reply-To' => $email,
-    'X-Mailer' => 'PHP/' . phpversion(),
-    'MIME-Version' => '1.0',
-    'Content-Type' => 'text/plain; charset=UTF-8'
+$smtp = array(
+    'host' => 'smtp.zoho.com',
+    'port' => 587,
+    'username' => 'contato@liviamedvet.com.br', // Substitua pelo seu email Zoho
+    'password' => 'Lfmslmlb_2026!', // Substitua pela sua senha
+    'from_email' => 'contato@liviamedvet.com.br', // Substitua pelo seu email Zoho
+    'from_name' => 'Lívia.medvet'
 );
 
-try {
-    // Inicia a conexão SMTP
-    $smtp = fsockopen($smtp_host, $smtp_port, $errno, $errstr, 30);
-    if (!$smtp) {
-        throw new Exception("Não foi possível conectar ao servidor SMTP: $errstr ($errno)");
+// Verifica se o formulário foi enviado
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_STRING);
+    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    
+    // Validação básica
+    if (empty($name) || empty($email) || empty($message)) {
+        header('Location: index.html?status=error#contato');
+        exit;
     }
 
-    // Função para enviar comando e verificar resposta
-    function send_command($smtp, $command, $expected_code = '') {
-        fwrite($smtp, $command . "\r\n");
-        $response = fgets($smtp, 515);
-        if ($expected_code && strpos($response, $expected_code) !== 0) {
-            throw new Exception("Erro SMTP: " . $response);
-        }
-        return $response;
+    // Cabeçalhos do e-mail
+    $headers = array(
+        'From: ' . $smtp['from_name'] . ' <' . $smtp['from_email'] . '>',
+        'Reply-To: ' . $email,
+        'MIME-Version: 1.0',
+        'Content-Type: text/html; charset=UTF-8'
+    );
+
+    // Conteúdo do e-mail
+    $subject = "Nova mensagem do site - " . $name;
+    $body = "
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .info { margin-bottom: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <h2>Nova mensagem recebida do site</h2>
+            <div class='info'><strong>Nome:</strong> {$name}</div>
+            <div class='info'><strong>E-mail:</strong> {$email}</div>
+            <div class='info'><strong>Telefone:</strong> {$phone}</div>
+            <div class='info'><strong>Mensagem:</strong><br>{$message}</div>
+        </div>
+    </body>
+    </html>";
+
+    // Configuração da conexão SMTP
+    $errno = 0;
+    $errstr = '';
+    $timeout = 30;
+
+    // Estabelece conexão com o servidor SMTP
+    $fp = fsockopen($smtp['host'], $smtp['port'], $errno, $errstr, $timeout);
+
+    if (!$fp) {
+        header('Location: index.html?status=error#contato');
+        exit;
     }
 
-    // Inicia a comunicação SMTP
-    send_command($smtp, "", "220");
-    send_command($smtp, "EHLO " . $_SERVER['SERVER_NAME'], "250");
+    // Lê a resposta inicial do servidor
+    $response = fgets($fp);
+    
+    // Inicia a conversação SMTP
+    fputs($fp, "EHLO " . $_SERVER['SERVER_NAME'] . "\r\n");
+    $response = fgets($fp);
 
-    // Inicia TLS se necessário
-    if (!$smtp_secure) {
-        send_command($smtp, "STARTTLS", "220");
-        stream_socket_enable_crypto($smtp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-        send_command($smtp, "EHLO " . $_SERVER['SERVER_NAME'], "250");
-    }
+    // Inicia STARTTLS
+    fputs($fp, "STARTTLS\r\n");
+    $response = fgets($fp);
+
+    // Ativa criptografia TLS
+    stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+
+    // Re-envia EHLO após TLS
+    fputs($fp, "EHLO " . $_SERVER['SERVER_NAME'] . "\r\n");
+    $response = fgets($fp);
 
     // Autenticação
-    send_command($smtp, "AUTH LOGIN", "334");
-    send_command($smtp, base64_encode($smtp_username), "334");
-    send_command($smtp, base64_encode($smtp_password), "235");
-
-    // Envia o email
-    send_command($smtp, "MAIL FROM:<" . $smtp_username . ">", "250");
-    send_command($smtp, "RCPT TO:<" . $to . ">", "250");
-    send_command($smtp, "DATA", "354");
-
-    // Monta o cabeçalho completo
-    $header = "";
-    foreach ($headers as $key => $value) {
-        $header .= $key . ": " . $value . "\r\n";
-    }
-
-    // Envia o conteúdo do email
-    fwrite($smtp, "Subject: " . $subject . "\r\n");
-    fwrite($smtp, $header . "\r\n");
-    fwrite($smtp, $email_body . "\r\n.\r\n");
-    send_command($smtp, "", "250");
-
-    // Finaliza a conexão
-    send_command($smtp, "QUIT", "221");
-    fclose($smtp);
-
-    // Redireciona com sucesso
-    header('Location: index.html?status=success');
-} catch (Exception $e) {
-    // Log do erro (você pode personalizar isso)
-    error_log("Erro ao enviar email: " . $e->getMessage());
+    fputs($fp, "AUTH LOGIN\r\n");
+    $response = fgets($fp);
     
-    // Redireciona com erro
-    header('Location: index.html?status=error');
+    fputs($fp, base64_encode($smtp['username']) . "\r\n");
+    $response = fgets($fp);
+    
+    fputs($fp, base64_encode($smtp['password']) . "\r\n");
+    $response = fgets($fp);
+
+    // Envia o e-mail
+    fputs($fp, "MAIL FROM: <" . $smtp['from_email'] . ">\r\n");
+    $response = fgets($fp);
+
+    fputs($fp, "RCPT TO: <" . $smtp['from_email'] . ">\r\n");
+    $response = fgets($fp);
+
+    fputs($fp, "DATA\r\n");
+    $response = fgets($fp);
+
+    // Monta o cabeçalho completo do e-mail
+    $email_headers = implode("\r\n", $headers) . "\r\n";
+    $email_headers .= "Subject: " . $subject . "\r\n\r\n";
+
+    // Envia o conteúdo do e-mail
+    fputs($fp, $email_headers . $body . "\r\n.\r\n");
+    $response = fgets($fp);
+
+    // Encerra a conexão
+    fputs($fp, "QUIT\r\n");
+    fclose($fp);
+
+    // Redireciona com status de sucesso
+    header('Location: index.html?status=success#contato');
+    exit;
+} else {
+    // Se alguém tentar acessar o arquivo diretamente, redireciona para a página inicial
+    header('Location: index.html');
+    exit;
 }
 ?>
