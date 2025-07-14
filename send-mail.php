@@ -1,10 +1,10 @@
 <?php
 // Configurações do SMTP
-define('SMTP_HOST', 'smtp.gmail.com');
+define('SMTP_HOST', 'smtp.zoho.com');
 define('SMTP_PORT', 587);  // Porta padrão para TLS
-define('SMTP_USERNAME', 'seu-email@gmail.com'); // Substitua pelo seu e-mail
-define('SMTP_PASSWORD', 'sua-senha-de-app'); // Substitua pela sua senha de app do Gmail
-define('SMTP_FROM', 'seu-email@gmail.com'); // E-mail que aparecerá como remetente
+define('SMTP_USERNAME', 'contato@liviamedvet.com.br'); // Substitua pelo seu e-mail
+define('SMTP_PASSWORD', 'Lfmslmlb_2026!'); // Substitua pela sua senha de app do Gmail
+define('SMTP_FROM', 'contato@liviamedvet.com.br'); // E-mail que aparecerá como remetente
 define('SMTP_FROM_NAME', 'Lívia.medvet'); // Nome que aparecerá como remetente
 
 // Função para enviar e-mail via SMTP
